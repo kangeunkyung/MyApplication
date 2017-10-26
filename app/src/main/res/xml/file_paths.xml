@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- name은 content:// 밑에 나오는 패키지 아래 경로인데 사진을 가리키는 위치
+         path는 갤러리 내 폴더명 -->
+    <external-path
+        name="eunkong"
+        path="eunkong" />
+
+</paths>
