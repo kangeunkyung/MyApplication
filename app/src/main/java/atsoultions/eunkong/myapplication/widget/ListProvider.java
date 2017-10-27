@@ -30,6 +30,7 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
 
     private static final String TAG = ListProvider.class.getSimpleName();
 
+    private ContactDbManager mSQLiteDB;
     private ArrayList<ListItem> listItemList = new ArrayList();
     private Context mContext = null;
     private int appWidgetId;
@@ -38,15 +39,15 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
         Log.i(TAG, "[ListProvider()]");
         mContext = context;
         appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-        populateListItem();
+
     }
 
-    private void populateListItem() {
-        Log.i(TAG, "[populateListItem()]");
+    private void initData() {
+        Log.i(TAG, "[initData()]");
         listItemList.clear();
 
         // 데이터베이스 생성
-        ContactDbManager mSQLiteDB = new ContactDbManager(mContext);
+        mSQLiteDB = new ContactDbManager(mContext);
 
         // 테이블 삭제
 //        mSQLiteDB.deleteTable();
@@ -62,12 +63,14 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
     @Override
     public void onCreate() {
         Log.i(TAG, "[onCreate()]");
+        initData();
+
     }
 
     @Override
     public void onDataSetChanged() {
         Log.i(TAG, "[onDataSetChanged()]");
-        populateListItem();
+        listItemList = mSQLiteDB.loadData();
     }
 
     @Override
@@ -87,21 +90,21 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
 
         final RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.widget_listitem);
 
-
-
         if(listItemList != null) {
             ListItem listItem = listItemList.get(position);
             remoteViews.setTextViewText(R.id.tv_widget_bank, listItem.getBank());
             remoteViews.setTextViewText(R.id.tv_widget_account, listItem.getAccount());
 
             // button click event
-//            Bundle extra = new Bundle();
-//            extra.putInt(WidgetProvider.EXTRA_ITEM, position);
-//            Intent fillIntent = new Intent();
-//            fillIntent.putExtra(EXTRA_BUNDLE, extra);
-//            remoteViews.setOnClickFillInIntent(R.id.btn_widget_copy, fillIntent);
+            Intent fillIntent = new Intent(mContext, WidgetProvider.class);
+            Bundle extra = new Bundle();
+            extra.putInt(WidgetProvider.EXTRA_ITEM, position);
+            extra.putString("bank", listItem.getBank());
+            extra.putString("account", listItem.getAccount());
+            fillIntent.putExtra(EXTRA_BUNDLE, extra);
+            fillIntent.setAction(APP_WIDGET_CLICK);
+            remoteViews.setOnClickFillInIntent(R.id.btn_widget_copy, fillIntent);
 
-            registerButtonListener(remoteViews, R.id.btn_widget_copy);
             Log.i(TAG, "[getViewAt()] bank : " + listItem.getBank() + ", account : " + listItem.getAccount());
         }
         return remoteViews;

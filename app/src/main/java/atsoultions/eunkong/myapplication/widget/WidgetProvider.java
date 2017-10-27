@@ -3,6 +3,7 @@ package atsoultions.eunkong.myapplication.widget;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.appwidget.AppWidgetProviderInfo;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
@@ -39,12 +40,13 @@ public class WidgetProvider extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-        Log.i(TAG, "[onReceive()]");
 
         String action = intent.getAction();
 
+        Log.i(TAG, "[onReceive()] action : " + action);
+
         if (AppWidgetManager.ACTION_APPWIDGET_UPDATE.equals(action)) {
-            Log.i(TAG, "ACTION_APPWIDGET_UPDATE");
+            Log.i(TAG, "[onReceive()] ACTION_APPWIDGET_UPDATE");
 
             Bundle extras = intent.getExtras();
 
@@ -54,6 +56,12 @@ public class WidgetProvider extends AppWidgetProvider {
                     this.onUpdate(context, AppWidgetManager.getInstance(context), appWidgetId);
             }
 
+        } else if(APP_WIDGET_CLICK.equals(action)) {
+            Bundle bundle = intent.getExtras();
+            String bank = bundle.getString("bank");
+            String account = bundle.getString("account");
+            Log.i(TAG, "[onReceive()] APP_WIDGET_CLICK - bank : " + bank + ", account : " + account);
+            Toast.makeText(context, "복사 버튼 ", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -74,7 +82,15 @@ public class WidgetProvider extends AppWidgetProvider {
 //            Intent configIntent = new Intent(context, MainActivity.class);
 //            PendingIntent configPendingIntent = PendingIntent.getActivity(context, 0, configIntent, 0);
 
+            // 리스트아이템 내 복사 버튼
+            Intent clickIntent = new Intent();
+            clickIntent.setAction(APP_WIDGET_CLICK);
+            PendingIntent clickPI = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            remoteViews.setPendingIntentTemplate(R.id.listview_widget, clickPI);
+
+            // 설정 버튼
             remoteViews.setOnClickPendingIntent(R.id.iv_setting, getPendingSelfIntent(context));
+
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 
@@ -119,7 +135,6 @@ public class WidgetProvider extends AppWidgetProvider {
         serviceIntent.setData(Uri.parse(serviceIntent.toUri(Intent.URI_INTENT_SCHEME)));
         remoteView.setRemoteAdapter(appWidgetId, R.id.listview_widget, serviceIntent);
         remoteView.setEmptyView(R.id.listview_widget, R.id.layout_empty_view);
-
         return remoteView;
     }
 
