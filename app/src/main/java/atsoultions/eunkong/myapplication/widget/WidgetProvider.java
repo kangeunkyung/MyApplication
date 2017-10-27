@@ -140,9 +140,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
     protected PendingIntent getPendingSelfIntent(Context context) {
         Intent configIntent = new Intent(context, MainActivity.class);
-        configIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        configIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        configIntent.addFlags(PendingIntent.FLAG_UPDATE_CURRENT);
+        configIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(context, 0, configIntent, 0);
     }
 
