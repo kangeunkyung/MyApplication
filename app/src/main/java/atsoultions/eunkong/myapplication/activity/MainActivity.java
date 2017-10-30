@@ -2,12 +2,14 @@ package atsoultions.eunkong.myapplication.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ public class MainActivity extends Activity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private ListViewAdapter mListViewAdapter;
+    private LinearLayout mllEmptyLayout, mllListLayout;
     private ListView mListView;
     private Button mBtnReset;
     private ImageView mBtnAdd;
@@ -39,10 +42,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mBtnAdd = findViewById(R.id.btn_add);
-        mBtnReset = findViewById(R.id.btn_reset);
-        mListView = findViewById(R.id.listview);
-        mListViewAdapter = new ListViewAdapter(MainActivity.this);
+        initView();
 
         // 데이터베이스 생성
         mSQLiteDB = new ContactDbManager(this);
@@ -58,12 +58,7 @@ public class MainActivity extends Activity {
         mListViewAdapter.setData(mItemArrayList);
         mListView.setAdapter(mListViewAdapter);
 
-        // 데이터 초기화
-        mBtnReset.setOnClickListener(onClickListener);
-
-        // 데이터 추가
-        mBtnAdd.setOnClickListener(onClickListener);
-
+        updateView();
 
     }
 
@@ -76,7 +71,38 @@ public class MainActivity extends Activity {
         mListViewAdapter.setData(mItemArrayList);
         mListViewAdapter.notifyDataSetChanged();
 
+        updateView();
+
     }
+
+    private void initView() {
+
+        mllEmptyLayout = findViewById(R.id.ll_empty_layout);
+        mllListLayout = findViewById(R.id.ll_list_layout);
+        mBtnAdd = findViewById(R.id.btn_add);
+        mBtnReset = findViewById(R.id.btn_reset);
+        mListView = findViewById(R.id.listview);
+        mListViewAdapter = new ListViewAdapter(MainActivity.this);
+
+        // 데이터 초기화
+        mBtnReset.setOnClickListener(onClickListener);
+
+        // 데이터 추가
+        mBtnAdd.setOnClickListener(onClickListener);
+
+    }
+
+    private void updateView() {
+
+        if(mItemArrayList.isEmpty()) {
+            mllEmptyLayout.setVisibility(View.VISIBLE);
+            mllListLayout.setVisibility(View.GONE);
+        } else {
+            mllEmptyLayout.setVisibility(View.GONE);
+            mllListLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
@@ -104,6 +130,7 @@ public class MainActivity extends Activity {
             }
         }
     };
+
 
 
 }

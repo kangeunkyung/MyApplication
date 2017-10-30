@@ -13,14 +13,14 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:src="@drawable/icon_info"/>
+            android:src="@drawable/icon_info" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="6"
             android:gravity="center"
-            android:text="마이계좌"/>
+            android:text="마이계좌" />
 
         <ImageView
             android:id="@+id/btn_add"
@@ -30,40 +30,62 @@
             android:src="@drawable/icon_add" />
     </LinearLayout>
 
+    <!-- 추후 삭제 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:orientation="horizontal"
         android:padding="10dp"
-        android:visibility="gone"
-        android:orientation="horizontal">
+        android:visibility="gone">
 
         <Button
             android:id="@+id/btn_reset"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="데이터 초기화"/>
+            android:text="데이터 초기화" />
 
         <Button
             android:id="@+id/btn_add2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="데이터 추가하기"/>
+            android:text="데이터 추가하기" />
 
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/listview"
+    <LinearLayout
+        android:id="@+id/ll_empty_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
-    </ListView>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_weight="1"
         android:gravity="center"
-        android:text="복사를 선택하면 계좌 정보가 클립보드에 복사됩니다."/>
+        android:visibility="gone">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="등록된 계좌가 없습니다.\n +를 선택해 계좌를 추가할 수 있습니다" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_list_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ListView
+            android:id="@+id/listview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"></ListView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="위젯에는 상위 3개 계좌만 노출됩니다.\n \'복사\' 를 선택하면 계좌정보가 클립보드에 복사됩니다." />
+    </LinearLayout>
 </LinearLayout>

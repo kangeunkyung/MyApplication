@@ -29,13 +29,14 @@ public class TextUtil {
      */
     static public void copyText(Context context, ListItem listItem) {
 
+        // ex) KB국민은행 91234567890 (예금주:강은경)
         final StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(listItem.getBank() + "\n");
-        stringBuffer.append(listItem.getAccount() + "\n");
+        stringBuffer.append(listItem.getBank() + " ");
+        stringBuffer.append(listItem.getAccount() + " ");
         if(TextUtils.isEmpty(listItem.getUser()) == false)
-            stringBuffer.append("(예금주 : " + listItem.getUser() + ")" + "\n");
-        if(TextUtils.isEmpty(listItem.getNickname()) == false)
-            stringBuffer.append(listItem.getNickname());
+            stringBuffer.append("(예금주 : " + listItem.getUser() + ")" + " ");
+//        if(TextUtils.isEmpty(listItem.getNickname()) == false)
+//            stringBuffer.append(listItem.getNickname());
 
         String text = stringBuffer.toString();
 

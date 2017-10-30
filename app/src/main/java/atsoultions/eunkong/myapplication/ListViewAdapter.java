@@ -2,8 +2,9 @@ package atsoultions.eunkong.myapplication;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +18,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import atsoultions.eunkong.myapplication.activity.UpdateActivity;
 import atsoultions.eunkong.myapplication.database.ContactDB;
@@ -113,6 +116,7 @@ public class ListViewAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View view) {
                     Toast.makeText(mContext, "복사되었습니다.", Toast.LENGTH_SHORT).show();
+                    startTimer(viewHolder.btnCopy);
                     TextUtil.copyText(mContext, listItem);
                 }
             });
@@ -141,4 +145,51 @@ public class ListViewAdapter extends BaseAdapter {
         Button btnCopy;
         ImageView ivModify;
     }
+
+    int timerCount;
+    Timer timer;
+    Handler handler = new Handler();
+
+    private void startTimer(final View view) {
+        Log.i(TAG, "[startTimer()]");
+        timer = new Timer();
+        timer.schedule(new TimerTask()
+        {
+            @Override
+            public void run() {
+                Log.i(TAG, "[startTimer()] run() timerCount : " + timerCount);
+                timerCount++;
+                update(view);
+            }
+        }, 0, 2000);
+
+    }
+
+    private void stopTimer() {
+        Log.i(TAG, "[stopTimer()] timerCount : " + timerCount);
+        timer.cancel();
+        timerCount = 0;
+    }
+
+    private void update(final View view)
+    {
+        Runnable updater = new Runnable() {
+            public void run() {
+                Log.i(TAG, "[update()] run() timerCount : " + timerCount);
+                Button btnCopy = (Button) view;
+
+                if(timerCount >= 2) {
+                    btnCopy.setBackgroundResource(R.color.colorLightGrey);
+                    btnCopy.setText("복사");
+                    stopTimer();
+                } else {
+                    btnCopy.setBackgroundResource(R.drawable.icon_checked);
+                    btnCopy.setText("");
+                }
+            }
+        };
+
+        handler.post(updater);
+    }
+
 }
