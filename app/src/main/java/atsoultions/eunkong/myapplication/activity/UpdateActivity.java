@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -27,12 +26,9 @@ import atsoultions.eunkong.myapplication.ListItem;
 import atsoultions.eunkong.myapplication.R;
 import atsoultions.eunkong.myapplication.database.ContactDB;
 import atsoultions.eunkong.myapplication.database.ContactDbManager;
+import atsoultions.eunkong.myapplication.dialog.CustomDialog;
 import atsoultions.eunkong.myapplication.util.TextUtil;
 import atsoultions.eunkong.myapplication.widget.WidgetProvider;
-import atsoultions.eunkong.myapplication.widget.WidgetService;
-
-import static atsoultions.eunkong.myapplication.widget.WidgetProvider.APP_WIDGET_CLICK;
-
 /**
  * Created by eunkong on 2017. 10. 18..
  */
@@ -60,6 +56,8 @@ public class UpdateActivity extends Activity {
     int no;
 
     private ContactDbManager mSQLiteDB;
+
+    private CustomDialog mCustomDialog;
 
 
 
@@ -99,13 +97,10 @@ public class UpdateActivity extends Activity {
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count){
                 Log.i(TAG, "[onTextChanged()] count : " + count + ", character : " + charSequence.toString());
-                if (count > 0) {
-                    mIsInput = true;
-                }
                 if (count > 0 && mSelectedPosition != 0)
-                    mBtnSave.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    mBtnSave.setBackgroundResource(R.color.colorPrimary);
                 else
-                    mBtnSave.setBackgroundColor(getResources().getColor(R.color.colorGrey));
+                    mBtnSave.setBackgroundResource(R.color.colorLightGrey);
             }
 
             @Override
@@ -117,10 +112,10 @@ public class UpdateActivity extends Activity {
         Log.i(TAG, " bank: " + mSpinnerBank.getSelectedItemPosition() +  ", account : " + mEtAccount.getText().toString());
         if(TextUtils.isEmpty(mEtAccount.getText().toString()) == false && mSpinnerBank.getSelectedItemPosition() != 0) {
            Log.i(TAG, "모두 입력된 상태");
-           mBtnSave.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+           mBtnSave.setBackgroundResource(R.color.colorPrimary);
         } else {
             Log.i(TAG, "모두 입력되지 않은 상태");
-            mBtnSave.setBackgroundColor(getResources().getColor(R.color.colorGrey));
+            mBtnSave.setBackgroundResource(R.color.colorLightGrey);
         }
 
     }
@@ -148,24 +143,27 @@ public class UpdateActivity extends Activity {
                 mSelectedPosition = position;
                 mSelectedBank = parent.getItemAtPosition(mSelectedPosition).toString();
 
-                if(position != 0) {
+                if(mSelectedPosition == 0) {
+                    mLayoutOptionalInput.setVisibility(View.GONE);
+                    mEtNickname.setText("");
+                } else {
                     mLayoutOptionalInput.setVisibility(View.VISIBLE);
+                    mEtNickname.setText(mSelectedBank + " 계좌");
                 }
 
-                if(mSelectedPosition !=0 && mIsInput == true)
-                    mBtnSave.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                if(mSelectedPosition != 0 && TextUtils.isEmpty(mEtAccount.getText().toString()) == false)
+                    mBtnSave.setBackgroundResource(R.color.colorPrimary);
                 else
-                    mBtnSave.setBackgroundColor(getResources().getColor(R.color.colorGrey));
+                    mBtnSave.setBackgroundResource(R.color.colorLightGrey);
+
                 Log.i(TAG, "selected position " + mSelectedPosition + ", item : " + parent.getItemAtPosition(position));
+
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-
-
-
 
     }
 
@@ -201,7 +199,7 @@ public class UpdateActivity extends Activity {
                 case R.id.btn_save:
 
                     Log.i(TAG, "mSelectedPosition : "+ mSelectedPosition);
-                    // TODO 은행 선택 및 계좌번호 입력 안했을 경우 알림 팝업 뜨도록 설정
+                    // TODO 추후 토스트 삭제
                     if(mSelectedPosition == 0) {
                         Toast.makeText(mContext, "은행을 입력해주세요", Toast.LENGTH_SHORT).show();
                         return;
@@ -228,27 +226,22 @@ public class UpdateActivity extends Activity {
                     break;
 
                 case R.id.iv_delete:
-                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
 
-                    alertDialogBuilder.setTitle("알림")
-                            .setMessage("카카오뱅크 계좌 정보를\n삭제하시겠습니까?")
-                            .setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.dismiss();
-                                }
-                            })
-                            .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    mSQLiteDB.deleteDataOne(no);
-                                    updateWidget();
-                                    finish();
-                                }
-                            });
-
-                    alertDialogBuilder.show();
-
+                    String content = mSelectedBank + " 계좌 정보를\n삭제하시겠습니까?";
+                    mCustomDialog = new CustomDialog(UpdateActivity.this, content, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            mSQLiteDB.deleteDataOne(no);
+                            updateWidget();
+                            finish();
+                        }
+                    }, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            mCustomDialog.dismiss();
+                        }
+                    });
+                    mCustomDialog.show();
 
                     break;
 
