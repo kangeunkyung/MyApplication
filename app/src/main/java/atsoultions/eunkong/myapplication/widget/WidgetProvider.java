@@ -17,6 +17,7 @@ import android.view.TextureView;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import atsoultions.eunkong.myapplication.ListItem;
 import atsoultions.eunkong.myapplication.R;
 import atsoultions.eunkong.myapplication.activity.MainActivity;
 import atsoultions.eunkong.myapplication.util.TextUtil;
@@ -39,8 +40,6 @@ public class WidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        super.onReceive(context, intent);
-
         String action = intent.getAction();
 
         Log.i(TAG, "[onReceive()] action : " + action);
@@ -57,45 +56,48 @@ public class WidgetProvider extends AppWidgetProvider {
             }
 
         } else if(APP_WIDGET_CLICK.equals(action)) {
-            Bundle bundle = intent.getExtras();
+
+            Bundle bundle = intent.getBundleExtra(EXTRA_BUNDLE);
+
+            int position = bundle.getInt(EXTRA_ITEM, 0);
             String bank = bundle.getString("bank");
             String account = bundle.getString("account");
-            Log.i(TAG, "[onReceive()] APP_WIDGET_CLICK - bank : " + bank + ", account : " + account);
-            Toast.makeText(context, "복사 버튼 ", Toast.LENGTH_SHORT).show();
-        }
 
+            ListItem listItem = new ListItem(bank, account);
+            TextUtil.copyText(context, listItem);
+            Log.i(TAG, "[onReceive()] APP_WIDGET_CLICK - position : " + position + ", bank : " + bank + ", account : " + account);
+        }
+        super.onReceive(context, intent);
     }
 
     // 위젯 갱신 주기에 따라 위젯을 갱신할 때 호출됨
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        super.onUpdate(context, appWidgetManager, appWidgetIds);
         final int size = appWidgetIds.length;
 
         Log.i(TAG, "[onUpdate()] size : " + size);
 
+        ListItem listItem = new ListItem();
 
         for (int i = 0; i < size; i++) {
             int appWidgetId = appWidgetIds[i];
             RemoteViews remoteViews = updateWidgetListView(context, appWidgetId);
 
-//            Intent configIntent = new Intent(context, MainActivity.class);
-//            PendingIntent configPendingIntent = PendingIntent.getActivity(context, 0, configIntent, 0);
-
             // 리스트아이템 내 복사 버튼
-            Intent clickIntent = new Intent();
+            Log.i(TAG, "[onUpdate()] listItem.toString()  : " + listItem.toString());
+            Intent clickIntent = new Intent(context, WidgetProvider.class);
             clickIntent.setAction(APP_WIDGET_CLICK);
             PendingIntent clickPI = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             remoteViews.setPendingIntentTemplate(R.id.listview_widget, clickPI);
 
             // 설정 버튼
             remoteViews.setOnClickPendingIntent(R.id.iv_setting, getPendingSelfIntent(context));
+            // 계좌등록 버튼
+            remoteViews.setOnClickPendingIntent(R.id.btn_add_account, getPendingSelfIntent(context));
 
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-
-
-
         }
+        super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
     // 위젯이 사용자에 의해 제거될 때 호출됨
