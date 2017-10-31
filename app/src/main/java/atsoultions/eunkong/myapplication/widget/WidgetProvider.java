@@ -20,6 +20,7 @@ import android.widget.Toast;
 import atsoultions.eunkong.myapplication.ListItem;
 import atsoultions.eunkong.myapplication.R;
 import atsoultions.eunkong.myapplication.activity.MainActivity;
+import atsoultions.eunkong.myapplication.activity.UpdateActivity;
 import atsoultions.eunkong.myapplication.util.TextUtil;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
@@ -91,9 +92,9 @@ public class WidgetProvider extends AppWidgetProvider {
             remoteViews.setPendingIntentTemplate(R.id.listview_widget, clickPI);
 
             // 설정 버튼
-            remoteViews.setOnClickPendingIntent(R.id.iv_setting, getPendingSelfIntent(context));
+            remoteViews.setOnClickPendingIntent(R.id.iv_setting, getPendingSelfIntent(context, MainActivity.class));
             // 계좌등록 버튼
-            remoteViews.setOnClickPendingIntent(R.id.btn_add_account, getPendingSelfIntent(context));
+            remoteViews.setOnClickPendingIntent(R.id.btn_add_account, getPendingSelfIntent(context, UpdateActivity.class));
 
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
         }
@@ -140,8 +141,9 @@ public class WidgetProvider extends AppWidgetProvider {
         return remoteView;
     }
 
-    protected PendingIntent getPendingSelfIntent(Context context) {
-        Intent configIntent = new Intent(context, MainActivity.class);
+    protected PendingIntent getPendingSelfIntent(Context context, Class<?> className) {
+        Intent configIntent = new Intent(context, className);
+        configIntent.putExtra("TYPE", "TYPE_ADD");
         configIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(context, 0, configIntent, 0);
     }

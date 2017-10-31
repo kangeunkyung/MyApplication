@@ -76,47 +76,20 @@ public class UpdateActivity extends Activity {
 
         initView();
 
-        if("TYPE_ADD".equalsIgnoreCase(intent.getStringExtra("TYPE"))) {
-            mIsAdd = true;
-            mIvDelete.setVisibility(View.INVISIBLE);
-            mTvTitle.setText("계좌등록");
-
-        } else {
+        if("TYPE_UPDATE".equalsIgnoreCase(intent.getStringExtra("TYPE"))){
             mIsAdd = false;
             mIvDelete.setVisibility(View.VISIBLE);
             mTvTitle.setText("계좌수정");
             ListItem listItem = mSQLiteDB.loadDataFromNo(no);
             setData(listItem);
+        } else {
+            mIsAdd = true;
+            mIvDelete.setVisibility(View.INVISIBLE);
+            mTvTitle.setText("계좌등록");
+
         }
-
-        mEtAccount.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int count){
-                Log.i(TAG, "[onTextChanged()] count : " + count + ", character : " + charSequence.toString());
-                if (count > 0 && mSelectedPosition != 0)
-                    mBtnSave.setBackgroundResource(R.color.colorPrimary);
-                else
-                    mBtnSave.setBackgroundResource(R.color.colorLightGrey);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
 
         Log.i(TAG, " bank: " + mSpinnerBank.getSelectedItemPosition() +  ", account : " + mEtAccount.getText().toString());
-        if(TextUtils.isEmpty(mEtAccount.getText().toString()) == false && mSpinnerBank.getSelectedItemPosition() != 0) {
-           Log.i(TAG, "모두 입력된 상태");
-           mBtnSave.setBackgroundResource(R.color.colorPrimary);
-        } else {
-            Log.i(TAG, "모두 입력되지 않은 상태");
-            mBtnSave.setBackgroundResource(R.color.colorLightGrey);
-        }
 
     }
 
@@ -156,7 +129,7 @@ public class UpdateActivity extends Activity {
                 else
                     mBtnSave.setBackgroundResource(R.color.colorLightGrey);
 
-                Log.i(TAG, "selected position " + mSelectedPosition + ", item : " + parent.getItemAtPosition(position));
+                Log.i(TAG, "selected position " + mSelectedPosition + ", item : " + mSelectedBank);
 
             }
 
@@ -164,6 +137,34 @@ public class UpdateActivity extends Activity {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+
+        // 계좌번호
+        mEtAccount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count){
+                Log.i(TAG, "[onTextChanged()] count : " + count + ", character : " + charSequence.toString());
+                if (count > 0 && mSelectedPosition != 0)
+                    mBtnSave.setBackgroundResource(R.color.colorPrimary);
+                else
+                    mBtnSave.setBackgroundResource(R.color.colorLightGrey);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+
+
+        // 은행 및 계좌번호 입력 유무에 따른 버튼 색상
+        if(TextUtils.isEmpty(mEtAccount.getText().toString()) == false && mSpinnerBank.getSelectedItemPosition() != 0) {
+            mBtnSave.setBackgroundResource(R.color.colorPrimary);
+        } else {
+            mBtnSave.setBackgroundResource(R.color.colorLightGrey);
+        }
 
     }
 
@@ -179,7 +180,6 @@ public class UpdateActivity extends Activity {
         if(TextUtils.isEmpty(listItem.getUser()) == false) {
             mEtUser.setText(listItem.getUser());
         }
-
 
         if(TextUtils.isEmpty(listItem.getNickname()) == false) {
             mEtNickname.setText(listItem.getNickname());
@@ -223,6 +223,7 @@ public class UpdateActivity extends Activity {
                     updateWidget();
 
                     finish();
+
                     break;
 
                 case R.id.iv_delete:
@@ -233,6 +234,7 @@ public class UpdateActivity extends Activity {
                         public void onClick(View view) {
                             mSQLiteDB.deleteDataOne(no);
                             updateWidget();
+                            mCustomDialog.dismiss();
                             finish();
                         }
                     }, new View.OnClickListener() {
@@ -241,6 +243,7 @@ public class UpdateActivity extends Activity {
                             mCustomDialog.dismiss();
                         }
                     });
+
                     mCustomDialog.show();
 
                     break;
