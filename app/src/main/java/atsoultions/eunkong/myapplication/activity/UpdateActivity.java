@@ -29,6 +29,10 @@ import atsoultions.eunkong.myapplication.database.ContactDbManager;
 import atsoultions.eunkong.myapplication.dialog.CustomDialog;
 import atsoultions.eunkong.myapplication.util.TextUtil;
 import atsoultions.eunkong.myapplication.widget.WidgetProvider;
+
+import static atsoultions.eunkong.myapplication.constant.Define.FROM_WHERE;
+import static atsoultions.eunkong.myapplication.constant.Define.FROM_WIDGET_PROVIDER;
+
 /**
  * Created by eunkong on 2017. 10. 18..
  */
@@ -193,7 +197,7 @@ public class UpdateActivity extends Activity {
             switch (view.getId()) {
 
                 case R.id.iv_prev:
-                    finish();
+                    onBackPressed();
                     break;
 
                 case R.id.btn_save:
@@ -266,10 +270,10 @@ public class UpdateActivity extends Activity {
 
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
 
-        Log.i(TAG, "[onActivityResult()] requestCode : " + requestCode + ", data : " + data);
+        Log.i(TAG, "[onActivityResult()] requestCode : " + requestCode + ", intent : " + intent);
 
     }
 }

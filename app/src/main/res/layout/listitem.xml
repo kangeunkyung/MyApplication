@@ -10,13 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:gravity="center_vertical"
-        android:padding="10dp"
+
         android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="3"
+            android:padding="10dp"
             android:gravity="center_vertical"
             android:orientation="vertical">
 
@@ -44,6 +45,7 @@
                 android:id="@+id/tv_account"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textStyle="bold"
                 android:text="" />
 
             <TextView
@@ -51,30 +53,32 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
+                android:textSize="12dp"
                 android:text="" />
         </LinearLayout>
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="10dp"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/iv_modify"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@drawable/icon_modify"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/icon_edit"
                 android:layout_gravity="right"/>
 
             <Button
                 android:id="@+id/btn_copy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/colorLightGrey"
+                android:layout_width="70dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/bg_input_default"
                 android:text="복사"/>
-        </LinearLayout>
+        </FrameLayout>
 
     </LinearLayout>
 </LinearLayout>

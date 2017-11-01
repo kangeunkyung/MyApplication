@@ -27,6 +27,12 @@ public class ListItem {
         this.account = account;
     }
 
+    public ListItem(String bank, String account, String user) {
+        this.bank = bank;
+        this.account = account;
+        this.user = user;
+    }
+
     public ListItem(int no, String bank, int bankIndex, String account) {
         this.no = no;
         this.bank = bank;

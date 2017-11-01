@@ -8,6 +8,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -15,6 +16,7 @@ import android.widget.RemoteViewsService;
 import java.util.ArrayList;
 
 import atsoultions.eunkong.myapplication.ListItem;
+import atsoultions.eunkong.myapplication.ListViewAdapter;
 import atsoultions.eunkong.myapplication.R;
 import atsoultions.eunkong.myapplication.database.ContactDbManager;
 
@@ -34,6 +36,8 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
     private ArrayList<ListItem> listItemList = new ArrayList();
     private Context mContext = null;
     private int appWidgetId;
+    private final int WIDGET_LIST_SIZE = 3;
+
 
     public ListProvider(Context context, Intent intent) {
         Log.i(TAG, "[ListProvider()]");
@@ -81,7 +85,15 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public int getCount() {
-        return (listItemList == null) ? 0 : listItemList.size();
+//        return (listItemList == null) ? 0 : listItemList.size();
+        if(listItemList == null)
+            return 0;
+        else {
+            if(listItemList.size() > 3)
+                return WIDGET_LIST_SIZE;
+            else
+                return listItemList.size();
+        }
     }
 
     @Override
@@ -94,6 +106,9 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
             ListItem listItem = listItemList.get(position);
             remoteViews.setTextViewText(R.id.tv_widget_bank, listItem.getBank());
             remoteViews.setTextViewText(R.id.tv_widget_account, listItem.getAccount());
+            if(TextUtils.isEmpty(listItem.getUser()) == false)
+                remoteViews.setTextViewText(R.id.tv_widget_user, "(예금주 : " + listItem.getUser() + ")");
+
 
             // button click event
             Intent fillIntent = new Intent(mContext, WidgetProvider.class);
@@ -101,11 +116,14 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
             extra.putInt(WidgetProvider.EXTRA_ITEM, position);
             extra.putString("bank", listItem.getBank());
             extra.putString("account", listItem.getAccount());
+            extra.putString("user", listItem.getUser());
+            extra.putInt("viewId", R.id.btn_widget_copy);
+            Log.d(TAG, "[getViewAt()] viewId : " + R.id.btn_widget_copy);
+
             fillIntent.putExtra(EXTRA_BUNDLE, extra);
             fillIntent.setAction(APP_WIDGET_CLICK);
             remoteViews.setOnClickFillInIntent(R.id.btn_widget_copy, fillIntent);
-
-            Log.i(TAG, "[getViewAt()] bank : " + listItem.getBank() + ", account : " + listItem.getAccount());
+            Log.i(TAG, "[getViewAt()] listItem : " + listItem.toString());
         }
         return remoteViews;
     }

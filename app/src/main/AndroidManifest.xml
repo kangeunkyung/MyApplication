@@ -19,6 +19,8 @@
         </activity>
 
         <activity android:name=".activity.UpdateActivity"></activity>
+        <activity android:name=".activity.TutorialActivity"></activity>
+        <activity android:name=".activity.InformationActivity"></activity>
 
         <!-- 위젯 -->
         <receiver
@@ -28,6 +30,7 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
                 <action android:name="android.appwidget.action.APPWIDGET_COPY"/>
                 <action android:name="android.appwidget.action.APPWIDGET_CLICK"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ADD"/>
             </intent-filter>
 
             <meta-data
@@ -35,11 +38,11 @@
                 android:resource="@xml/widget_provider_basic"></meta-data>
         </receiver>
 
-        <receiver android:name=".widget.WidgetReceiver">
-            <intent-filter>
-            <action android:name="android.appwidget.action.APP_WIDGET_CLICK"/>
-            </intent-filter>
-        </receiver>
+        <!--<receiver android:name=".widget.WidgetReceiver">-->
+            <!--<intent-filter>-->
+            <!--<action android:name="android.appwidget.action.APP_WIDGET_CLICK"/>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
         <provider
             android:authorities="atsoultions.eunkong.myapplication"
             android:name="android.support.v4.content.FileProvider"
@@ -52,7 +55,9 @@
 
         <service
             android:name=".widget.WidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS"></service>
+            android:permission="android.permission.BIND_REMOTEVIEWS">
+
+        </service>
     </application>
 
 </manifest>

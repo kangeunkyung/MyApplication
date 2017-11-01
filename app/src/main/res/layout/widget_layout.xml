@@ -3,25 +3,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
+    android:background="#aaffffff"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="30dp">
+        android:layout_height="30dp"
+        android:gravity="center_vertical"
+        android:background="#ddaaaaaa">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="마이계좌" />
+            android:layout_marginLeft="10dp"
+            android:text="@string/app_actionbar_title" />
 
         <ImageView
             android:id="@+id/iv_setting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:src="@drawable/btn_setting" />
+            android:layout_marginRight="10dp"
+            android:src="@drawable/icon_setting" />
     </LinearLayout>
 
     <ListView

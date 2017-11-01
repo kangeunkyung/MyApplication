@@ -1,5 +1,6 @@
 package atsoultions.eunkong.myapplication;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -24,6 +26,9 @@ import java.util.TimerTask;
 import atsoultions.eunkong.myapplication.activity.UpdateActivity;
 import atsoultions.eunkong.myapplication.database.ContactDB;
 import atsoultions.eunkong.myapplication.util.TextUtil;
+
+import static atsoultions.eunkong.myapplication.constant.Define.TYPE;
+import static atsoultions.eunkong.myapplication.constant.Define.TYPE_UPDATE;
 
 
 /**
@@ -108,6 +113,7 @@ public class ListViewAdapter extends BaseAdapter {
                 viewHolder.tvNickname.setText(mList.get(i).getNickname());
             }
 
+            final TimerHandler timerHandler = new TimerHandler(mContext);
 
 
             final ListItem listItem = mList.get(i);
@@ -115,8 +121,8 @@ public class ListViewAdapter extends BaseAdapter {
             viewHolder.btnCopy.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(mContext, "복사되었습니다.", Toast.LENGTH_SHORT).show();
-                    startTimer(viewHolder.btnCopy);
+//                    Toast.makeText(mContext, "복사되었습니다.", Toast.LENGTH_SHORT).show();
+                    timerHandler.startTimer(viewHolder.btnCopy);
                     TextUtil.copyText(mContext, listItem);
                 }
             });
@@ -126,7 +132,7 @@ public class ListViewAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(mContext, UpdateActivity.class);
-                    intent.putExtra("TYPE", "TYPE_UPDATE");
+                    intent.putExtra(TYPE, TYPE_UPDATE);
                     intent.putExtra(ContactDB._ID, mList.get(i).getNo());
                     mContext.startActivity(intent);
                 }
@@ -146,50 +152,5 @@ public class ListViewAdapter extends BaseAdapter {
         ImageView ivModify;
     }
 
-    int timerCount;
-    Timer timer;
-    Handler handler = new Handler();
-
-    private void startTimer(final View view) {
-        Log.i(TAG, "[startTimer()]");
-        timer = new Timer();
-        timer.schedule(new TimerTask()
-        {
-            @Override
-            public void run() {
-                Log.i(TAG, "[startTimer()] run() timerCount : " + timerCount);
-                timerCount++;
-                update(view);
-            }
-        }, 0, 2000);
-
-    }
-
-    private void stopTimer() {
-        Log.i(TAG, "[stopTimer()] timerCount : " + timerCount);
-        timer.cancel();
-        timerCount = 0;
-    }
-
-    private void update(final View view)
-    {
-        Runnable updater = new Runnable() {
-            public void run() {
-                Log.i(TAG, "[update()] run() timerCount : " + timerCount);
-                Button btnCopy = (Button) view;
-
-                if(timerCount >= 2) {
-                    btnCopy.setBackgroundResource(R.color.colorLightGrey);
-                    btnCopy.setText("복사");
-                    stopTimer();
-                } else {
-                    btnCopy.setBackgroundResource(R.drawable.icon_checked);
-                    btnCopy.setText("");
-                }
-            }
-        };
-
-        handler.post(updater);
-    }
 
 }

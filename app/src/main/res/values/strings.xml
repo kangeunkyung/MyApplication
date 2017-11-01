@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">마이계좌</string>
+    <string name="app_name">보내다오</string>
+    <string name="app_actionbar_title">보내다오</string>
+    <string name="info">긴 계좌번호가\n 잘 외워지지 않는 내 머리를\n 미워 하기엔\n\n
+    길게 눌러 복사하기가 잘 안되는\n내 손가락을 탓하기에도\n\n
+    우린 참 소중한 존재입니다.\n\n
+    보내다오 한번에 클릭해서\n문자나 카톡에 붙여 넣으세요.\n\n
+    더 좋은 청구 서비스로\n계속 진화 하겠습니다.\n포켓몬처럼</string>
 </resources>

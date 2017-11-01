@@ -11,20 +11,32 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.TextureView;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import atsoultions.eunkong.myapplication.ListItem;
+import atsoultions.eunkong.myapplication.ListViewAdapter;
 import atsoultions.eunkong.myapplication.R;
+import atsoultions.eunkong.myapplication.TimerHandler;
 import atsoultions.eunkong.myapplication.activity.MainActivity;
 import atsoultions.eunkong.myapplication.activity.UpdateActivity;
 import atsoultions.eunkong.myapplication.util.TextUtil;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP;
+import static atsoultions.eunkong.myapplication.constant.Define.FROM_WHERE;
+import static atsoultions.eunkong.myapplication.constant.Define.FROM_WIDGET_PROVIDER;
+import static atsoultions.eunkong.myapplication.constant.Define.TYPE;
+import static atsoultions.eunkong.myapplication.constant.Define.TYPE_ADD;
 
 /**
  * Created by eunkong on 2017. 10. 24..
@@ -36,8 +48,10 @@ public class WidgetProvider extends AppWidgetProvider {
 
     public static final String APP_WIDGET_COPY = "android.appwidget.action.APPWIDGET_COPY";
     public static final String APP_WIDGET_CLICK = "android.appwidget.action.APPWIDGET_CLICK";
+    public static final String APP_WIDGET_ADD = "android.appwidget.action.APPWIDGET_ADD";
     public static final String EXTRA_ITEM = "EXTRA_ITEM";
     public static final String EXTRA_BUNDLE = "EXTRA_BUNDLE";
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -63,10 +77,17 @@ public class WidgetProvider extends AppWidgetProvider {
             int position = bundle.getInt(EXTRA_ITEM, 0);
             String bank = bundle.getString("bank");
             String account = bundle.getString("account");
+            String user = bundle.getString("user");
+            int viewId = bundle.getInt("viewId");
 
-            ListItem listItem = new ListItem(bank, account);
+            ListItem listItem = new ListItem(bank, account, user);
+
             TextUtil.copyText(context, listItem);
-            Log.i(TAG, "[onReceive()] APP_WIDGET_CLICK - position : " + position + ", bank : " + bank + ", account : " + account);
+
+            // 체크 이미지 2초간 보여줄 타이머 핸들러
+            Log.i(TAG, "[onReceive()] APP_WIDGET_CLICK - position : " + position + ", bank : " + bank + ", account : " + account + ", user : " + user);
+        } else if(APP_WIDGET_ADD.equals(action)) {
+            Log.i(TAG, "[onReceive()] fromWhere : " + intent.getStringExtra(FROM_WHERE));
         }
         super.onReceive(context, intent);
     }
@@ -93,8 +114,15 @@ public class WidgetProvider extends AppWidgetProvider {
 
             // 설정 버튼
             remoteViews.setOnClickPendingIntent(R.id.iv_setting, getPendingSelfIntent(context, MainActivity.class));
+
+
             // 계좌등록 버튼
-            remoteViews.setOnClickPendingIntent(R.id.btn_add_account, getPendingSelfIntent(context, UpdateActivity.class));
+            Intent configIntent = new Intent(context, MainActivity.class);
+            configIntent.setAction(APP_WIDGET_ADD);
+            configIntent.putExtra(TYPE, TYPE_ADD);
+            configIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, configIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            remoteViews.setOnClickPendingIntent(R.id.btn_add_account, pendingIntent);
 
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
         }
@@ -143,7 +171,8 @@ public class WidgetProvider extends AppWidgetProvider {
 
     protected PendingIntent getPendingSelfIntent(Context context, Class<?> className) {
         Intent configIntent = new Intent(context, className);
-        configIntent.putExtra("TYPE", "TYPE_ADD");
+        configIntent.putExtra(TYPE, TYPE_ADD);
+        configIntent.putExtra(FROM_WHERE, FROM_WIDGET_PROVIDER);
         configIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(context, 0, configIntent, 0);
     }
@@ -159,6 +188,61 @@ public class WidgetProvider extends AppWidgetProvider {
         PendingIntent clickPI = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setPendingIntentTemplate(R.id.listview_widget, clickPI);
 
+    }
+
+    private int timerCount;
+    private Timer timer;
+    private Handler handler = new Handler();
+
+
+    public void startTimer(final Context context, final int viewId) {
+        Log.i(TAG, "[startTimer()]");
+        timer = new Timer();
+        timer.schedule(new TimerTask()
+        {
+            @Override
+            public void run() {
+                Log.i(TAG, "[startTimer()] run() timerCount : " + timerCount);
+                timerCount++;
+                update(context, viewId);
+            }
+        }, 0, 2000);
+
+    }
+
+    public void update(final Context context, final int viewId)
+    {
+        Runnable updater = new Runnable() {
+            public void run() {
+                Log.i(TAG, "[update()] run() timerCount : " + timerCount);
+                MainActivity mainActivity = new MainActivity(context);
+                Button btnCopy;
+                if(mainActivity != null)
+                    btnCopy = (Button) mainActivity.getFindViewById(viewId);
+                else {
+                    stopTimer();
+                    return;
+                }
+
+
+                if(timerCount >= 2) {
+                    btnCopy.setBackgroundResource(R.drawable.bg_input_default);
+                    btnCopy.setText("복사");
+                    stopTimer();
+                } else {
+                    btnCopy.setBackgroundResource(R.drawable.icon_check);
+                    btnCopy.setText("");
+                }
+            }
+        };
+
+        handler.post(updater);
+    }
+
+    public void stopTimer() {
+        Log.i(TAG, "[stopTimer()] timerCount : " + timerCount);
+        timer.cancel();
+        timerCount = 0;
     }
 
 }
